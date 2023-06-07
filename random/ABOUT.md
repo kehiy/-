@@ -1,2 +1,3 @@
 # RANDOM number generator
-just a simple and stupid and unsafe way to generate some random number
+a way to generate pseudorandom numbers in python (or any programming language)
+that use unix time stamp as a seed (or anything you pass it)
