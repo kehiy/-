@@ -9,7 +9,7 @@ def gen_seed():
 # seed : your seed number
 # length : your random number length
 def random(seed : int, length : int = 10):
-    return str(int((int(str(seed)[-4:]) * seed / int(str(seed)[5:])) * (seed ** 8)))[-length:]
+    return str(int((int(str(seed)[-2:]) * seed / int(str(seed)[-8:])) * (seed * 7)))[-length:]
     
 
 
