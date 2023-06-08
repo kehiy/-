@@ -4,7 +4,7 @@ import time
 # generates a seed from unix time stamp
 def gen_seed():
     pid = os.getppid()
-    seed = int(str(time.time()).replace('.', '')[-8:])  + pid
+    seed = int(str(time.time()).replace('.', '')[-8:])  + pid * (pid - 10)
     return seed
 
 # return a pseudorandom number
