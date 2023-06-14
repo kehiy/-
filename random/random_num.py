@@ -1,7 +1,7 @@
 import os
 import time
 
-# generates a seed from unix time stamp
+# generates a seed from unix time stamp and the pid
 def gen_seed():
     pid = os.getppid()
     seed = int(str(time.time()).replace('.', '')[-8:])  + pid * (pid - 10)
