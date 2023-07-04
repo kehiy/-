@@ -24,6 +24,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("error in change dns: %v/n", err)
 			} else {
+				fmt.Print("dns set successfully:\n", list)
 				os.Exit(0)
 			}
 		} else if arg == "2" {
@@ -32,6 +33,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("error in change dns: %v/n", err)
 			} else {
+				fmt.Print("dns set successfully:\n", list)
 				os.Exit(0)
 			}
 		} else {
@@ -44,13 +46,14 @@ func main() {
 	if err != nil {
 		fmt.Printf("error in change dns: %v/n", err)
 	}
+	fmt.Print("dns set successfully:\n", list)
 	os.Exit(0)
 }
 
 func changeDNS(DNSs []string) error {
 	path := "/etc/resolv.conf"
 
-	newContent := "kehiy dns managee\n"
+	newContent := "managed by kehiy dns manager CLI\n"
 	for _, dns := range DNSs {
 		newContent += fmt.Sprintf("nameserver %s\n", dns)
 	}
