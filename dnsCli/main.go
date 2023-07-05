@@ -36,6 +36,12 @@ func main() {
 				fmt.Print("dns set successfully:\n", list)
 				os.Exit(0)
 			}
+		} else if arg == "show" {
+			data, err := showReslove()
+			if err != nil {
+				fmt.Printf("error showing dns conf: %v", err)
+			}
+			fmt.Println(data)
 		} else {
 			break
 		}
@@ -64,4 +70,15 @@ func changeDNS(DNSs []string) error {
 	}
 
 	return nil
+}
+
+func showReslove() (string, error) {
+	path := "/etc/resolv.conf"
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
