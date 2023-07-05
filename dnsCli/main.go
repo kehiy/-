@@ -23,6 +23,7 @@ func main() {
 			err = changeDNS(list)
 			if err != nil {
 				fmt.Printf("error in change dns: %v/n", err)
+				os.Exit(1)
 			} else {
 				fmt.Print("dns set successfully:\n", list)
 				os.Exit(0)
@@ -32,6 +33,7 @@ func main() {
 			err = changeDNS(list)
 			if err != nil {
 				fmt.Printf("error in change dns: %v/n", err)
+				os.Exit(1)
 			} else {
 				fmt.Print("dns set successfully:\n", list)
 				os.Exit(0)
@@ -40,8 +42,10 @@ func main() {
 			data, err := showReslove()
 			if err != nil {
 				fmt.Printf("error showing dns conf: %v", err)
+				os.Exit(1)
 			}
 			fmt.Println(data)
+			os.Exit(0)
 		} else {
 			break
 		}
