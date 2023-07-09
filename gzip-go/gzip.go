@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	inputData, err := ioutil.ReadFile("./words.txt")
+	inputData, err := ioutil.ReadFile("./words.txt") // https://github.com/dwyl/english-words
 	if err != nil {
 		log.Fatal("error reading data:", err)
 	}
