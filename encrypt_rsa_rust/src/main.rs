@@ -1,6 +1,5 @@
 use rsa::{Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey};
 
-
 fn main() {
     let mut rng = rand::thread_rng();
     let bits = 2048;
