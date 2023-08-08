@@ -39,7 +39,7 @@ func main() {
 				os.Exit(0)
 			}
 		} else if arg == "show" {
-			data, err := showReslove()
+			data, err := showResolve()
 			if err != nil {
 				fmt.Printf("error showing dns conf: %v", err)
 				os.Exit(1)
@@ -76,7 +76,7 @@ func changeDNS(DNSs []string) error {
 	return nil
 }
 
-func showReslove() (string, error) {
+func showResolve() (string, error) {
 	path := "/etc/resolv.conf"
 
 	data, err := ioutil.ReadFile(path)
