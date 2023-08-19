@@ -27,4 +27,4 @@ func main() {
 	}
 	fileString := string(fileBytes)
 	fmt.Println(kash(fileString))
-} 
+}

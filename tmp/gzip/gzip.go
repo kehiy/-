@@ -32,8 +32,8 @@ func main() {
 	fmt.Printf("Input Size: %d bytes\n", inputSize)
 	fmt.Printf("Compressed Size: %d bytes\n", compressedSize)
 	/*
-	output:(using words.txt):
-	!Input Size: 4862992 bytes
-	!Compressed Size: 1474416 bytes
+		output:(using words.txt):
+		!Input Size: 4862992 bytes
+		!Compressed Size: 1474416 bytes
 	*/
 }

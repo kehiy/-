@@ -68,7 +68,7 @@ func changeDNS(DNSs []string) error {
 		newContent += fmt.Sprintf("nameserver %s\n", dns)
 	}
 
-	err := ioutil.WriteFile(path, []byte(newContent), 0644)
+	err := ioutil.WriteFile(path, []byte(newContent), 0o644)
 	if err != nil {
 		return err
 	}
