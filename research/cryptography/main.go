@@ -6,12 +6,13 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/md5"
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
 	"os"
 
-	"github.com/btcsuite/btcutil/base58"
+	"github.com/btcsuite/btcutil/bech32"
 )
 
 // SignData signs the provided data using the private key
@@ -72,9 +73,17 @@ func encodeToBinary(value interface{}) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func getAddressBase58(pubB []byte) string {
-	hash := sha256.Sum256(pubB)
-	return "Z1" + base58.Encode(hash[:])
+func getAddressBech32(pref string,pubB []byte) string {
+	hash := md5.Sum(pubB)
+	conv, err := bech32.ConvertBits(hash[:], 8, 5, true)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	encoded, err := bech32.Encode(pref, conv)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	return encoded
 }
 
 func main() {
@@ -101,6 +110,8 @@ func main() {
 	}
 	fmt.Println("Transaction verified:", verifyResult)
 
-	fmt.Printf("bas58 addr: %v\n", getAddressBase58(pubB))
-	fmt.Printf("len %v\n", len(getAddressBase58(pubB)))
+	fmt.Printf("bech32 addr: %v\n", getAddressBech32("Z", pubB)) // Z17zeaxfjctc9j6kms7kck5nurx5026guh
+	fmt.Printf("len %v\n", len(getAddressBech32("Z", pubB))) // 34
+	// fmt.Printf("pubSize %v\n", len(pubB))
+	// fmt.Printf("addrSize %v\n", len([]byte(getAddressBech32("Z", pubB))))
 }
