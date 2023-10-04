@@ -16,7 +16,7 @@ fn main() {
     print!("\x1b[?25l");
     loop {
         let t: DateTime<Local> = Local::now();
-        let ft: String = t.format("%H:%S:%S").to_string();
+        let ft: String = t.format("%H:%M:%S").to_string();
         for row in &DIGITS {
              for c in  ft.chars() {
                  let col = match c {
