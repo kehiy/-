@@ -1,5 +1,5 @@
-use std::net::{SocketAddrV4, Ipv4Addr, TcpListener};
-use std::io::{Read, Error};
+use std::io::{Error, Read};
+use std::net::{Ipv4Addr, SocketAddrV4, TcpListener};
 
 fn main() -> Result<(), Error> {
     let loopback = Ipv4Addr::new(127, 0, 0, 1);
