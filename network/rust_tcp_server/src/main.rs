@@ -1,26 +1,40 @@
-use std::io::{Error, Read};
-use std::net::{Ipv4Addr, SocketAddrV4, TcpListener};
+use std::net::{TcpListener, TcpStream};
+use std::thread;
+use std::io::Read;
+use std::io::Write;
 
-fn main() -> Result<(), Error> {
-    let loopback = Ipv4Addr::new(127, 0, 0, 1);
+fn handle_client(mut stream: TcpStream) {
+    // read 20 bytes at a time from stream echoing back to stream
+    loop {
+        let mut read = [0; 1028];
+        match stream.read(&mut read) {
+            Ok(n) => {
+                if n == 0 {
+                    // connection was closed
+                    break;
+                }
+                stream.write(&read[0..n]).unwrap();
+            }
+            Err(err) => {
+                panic!("{}", err);
+            }
+        }
+    }
+}
 
-    let socket = SocketAddrV4::new(loopback, 0);
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
 
-    let listener = TcpListener::bind(socket)?;
-
-    let port = listener.local_addr()?;
-
-    println!("Listening on {}, access this port to end the program", port);
-
-    let (mut tcp_stream, addr) = listener.accept()?; //block  until requested
-
-    println!("Connection received! {:?} is sending data.", addr);
-
-    let mut input = String::new();
-
-    let _ = tcp_stream.read_to_string(&mut input)?;
-
-    println!("{:?} says {}", addr, input);
-
-    Ok(())
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                thread::spawn(move || {
+                    handle_client(stream);
+                });
+            }
+            Err(_) => {
+                println!("Error");
+            }
+        }
+    }
 }
