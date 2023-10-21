@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{env, fs, process};
 
 struct Config {
     query: String,
@@ -7,7 +7,10 @@ struct Config {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let config: Config = Config::new(&args);
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("{}", err);
+        process::exit(1);
+    });
 
     println!("Searching for {:?}", config.query);
     println!("In: {:?}", config.file_name);
@@ -18,14 +21,14 @@ fn main() {
 }
 
 impl Config {
-    fn new(args: &[String]) -> Config {
+    fn new(args: &[String]) -> Result<Config, &str> {
         if args.len() < 3 {
-            panic!("please provide both file name and query.")
+            return Err("please provide both file name and query.");
         }
 
         let query = args[1].clone();
         let file_name = args[2].clone();
 
-        Config { query, file_name }
+        Ok(Config { query, file_name })
     }
 }
