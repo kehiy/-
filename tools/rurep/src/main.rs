@@ -1,4 +1,4 @@
-use std::{env, fs, process};
+use std::{env, error::Error, fs, process};
 
 struct Config {
     query: String,
@@ -12,12 +12,18 @@ fn main() {
         process::exit(1);
     });
 
-    println!("Searching for {:?}", config.query);
-    println!("In: {:?}", config.file_name);
+    if let Err(e) = run(config) {
+        println!("{}", e);
+        process::exit(1);
+    }
+}
 
-    let data = fs::read_to_string(config.file_name).expect("error while reading the file!");
-
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let data = fs::read_to_string(config.file_name)?;
     println!("file data:\n{}", data);
+    println!("query:\n{}", config.query);
+
+    Ok(())
 }
 
 impl Config {
