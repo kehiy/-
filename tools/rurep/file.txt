@@ -1,0 +1,3 @@
+hello this is some random text to test my search cli, which is a kind of grep but I wrote it whit rust.
+this project is just for learning how to write cli in rust.
+after this I will write another cli tool to check file difference and print it out?!?!?
