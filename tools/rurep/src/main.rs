@@ -19,6 +19,10 @@ fn main() {
 
 impl Config {
     fn new(args: &[String]) -> Config {
+        if args.len() < 3 {
+            panic!("please provide both file name and query.")
+        }
+
         let query = args[1].clone();
         let file_name = args[2].clone();
 
