@@ -1,3 +1,0 @@
-# RUWALL
-
-rust bitcoin wallet
