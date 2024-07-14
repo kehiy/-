@@ -26,7 +26,7 @@ for addr in "${my_array[@]}"; do
     random_number=$(( $(( RANDOM % ($max - $min + 1) )) + $min ))
     
     # Creating command string
-    command="pactus_wallet tx transfer $address $addr $random_number --path=$wallet_path"
+    command="pactus-wallet tx transfer $address $addr $random_number --path=$wallet_path"
 
     echo "Going to send $random_number PAC to $addr"
 
