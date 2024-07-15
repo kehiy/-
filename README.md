@@ -1,6 +1,1 @@
-# -
-just a sandbox for my wired ideas!
-
-read ABOUT.md s to understand wtf the code do.
-
-this project are not in same field or with same Languages.
+The - is a sandbox or playground for me to keep irrelevant stuff, codes, scripts and research in one place. You may find something useful here but that's not the goal.
