@@ -10,7 +10,7 @@ import (
 func 
 main() {
 	st := time.Now()
-	count := 10
+	count := 1_000_000
 	coll := make(map[string]int, 0)
 	for i := 0; i < count; i++ {
 		id := uuid.New()
