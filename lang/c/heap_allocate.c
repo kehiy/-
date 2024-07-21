@@ -9,11 +9,15 @@ typedef struct {
 
 #define HEAP_CAP 640000
 #define HEAP_ALLOCED_CAP 1024
+#define HEAP_FREED_CAP 1024
 
 Heap_Chunk heap_alloced[HEAP_ALLOCED_CAP] = {0};
 
 size_t heap_size = 0;
 size_t heap_alloced_size = 0;
+
+Heap_Chunk heap_freed[HEAP_FREED_CAP] = {0};
+size_t heap_freed_size = 0;
 
 char heap[HEAP_CAP] = {0};
 
@@ -41,8 +45,11 @@ void *halloc(size_t size)
 
 void hfree(void *ptr)
 {
-    (void) ptr;
-    assert(false && "Not implemented");
+    for (size_t i = 0; i < heap_alloced_size; i++) {
+		if (heap_alloced[i].start == ptr) {
+			printf("free the memory!");
+		}
+	}
 }
 
 void hcollect()
@@ -63,7 +70,10 @@ void dump_alloced_chunks(void)
 int main(void)
 {
     for (int i = 0; i < 100; i++) {
-		halloc(i);
+		void *p = halloc(i);
+		if ((i & 0x1) == 0) {
+			hfree(p);
+		}
 	}
 
     dump_alloced_chunks();
