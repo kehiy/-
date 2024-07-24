@@ -11,10 +11,6 @@
 #include <unistd.h>
 
 // TODO: refactor the code!!!
-
-#define MEMORY_MAX (1 << 16)
-uint16_t memory[MEMORY_MAX]; /* 65536 locations */
-
 enum {
   R_R0 = 0,
   R_R1,
@@ -28,8 +24,6 @@ enum {
   R_COND,
   R_COUNT
 };
-
-uint16_t reg[R_COUNT];
 
 enum {
   FL_POS = 1 << 0, /* P */
@@ -57,6 +51,11 @@ enum {
 };
 
 enum {
+  MR_KBSR = 0xFE00, /* keyboard status */
+  MR_KBDR = 0xFE02  /* keyboard data */
+};
+
+enum {
   TRAP_GETC =
       0x20, /* get character from keyboard, not echoed onto the terminal */
   TRAP_OUT = 0x21,   /* output a character */
@@ -66,10 +65,39 @@ enum {
   TRAP_HALT = 0x25   /* halt the program */
 };
 
-enum {
-  MR_KBSR = 0xFE00, /* keyboard status */
-  MR_KBDR = 0xFE02  /* keyboard data */
-};
+#define MEMORY_MAX (1 << 16)
+uint16_t memory[MEMORY_MAX]; /* 65536 locations */
+uint16_t reg[R_COUNT];
+
+struct termios original_tio;
+
+void disable_input_buffering() {
+  tcgetattr(STDIN_FILENO, &original_tio);
+  struct termios new_tio = original_tio;
+  new_tio.c_lflag &= ~ICANON & ~ECHO;
+  tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
+}
+
+void restore_input_buffering() {
+  tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
+}
+
+uint16_t check_key() {
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  FD_SET(STDIN_FILENO, &readfds);
+
+  struct timeval timeout;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+  return select(1, &readfds, NULL, NULL, &timeout) != 0;
+}
+
+void handle_interrupt(int signal) {
+  restore_input_buffering();
+  printf("\n");
+  exit(-2);
+}
 
 uint16_t sign_extend(uint16_t x, int bit_count) {
   /*
@@ -90,6 +118,17 @@ uint16_t sign_extend(uint16_t x, int bit_count) {
 
 uint16_t swap16(uint16_t x) { return (x << 8) | (x >> 8); }
 
+void update_flags(uint16_t r) {
+  if (reg[r] == 0) {
+    reg[R_COND] = FL_ZRO;
+  } else if (reg[r] >> 15) /* a 1 in the left-most bit indicates negative */
+  {
+    reg[R_COND] = FL_NEG;
+  } else {
+    reg[R_COND] = FL_POS;
+  }
+}
+
 void read_image_file(FILE *file) {
   /* the origin tells us where in memory to place the image */
   uint16_t origin;
@@ -107,16 +146,15 @@ void read_image_file(FILE *file) {
     ++p;
   }
 }
-
-uint16_t check_key() {
-  fd_set readfds;
-  FD_ZERO(&readfds);
-  FD_SET(STDIN_FILENO, &readfds);
-
-  struct timeval timeout;
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 0;
-  return select(1, &readfds, NULL, NULL, &timeout) != 0;
+/* a wrapper for read_image_file to input path string */
+int read_image(const char *image_path) {
+  FILE *file = fopen(image_path, "rb");
+  if (!file) {
+    return 0;
+  };
+  read_image_file(file);
+  fclose(file);
+  return 1;
 }
 
 void mem_write(uint16_t address, uint16_t val) { memory[address] = val; }
@@ -133,57 +171,16 @@ uint16_t mem_read(uint16_t address) {
   return memory[address];
 }
 
-struct termios original_tio;
-
-void disable_input_buffering() {
-  tcgetattr(STDIN_FILENO, &original_tio);
-  struct termios new_tio = original_tio;
-  new_tio.c_lflag &= ~ICANON & ~ECHO;
-  tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
-}
-
-void restore_input_buffering() {
-  tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
-}
-
-/* a wrapper for read_image_file to input path string */
-int read_image(const char *image_path) {
-  FILE *file = fopen(image_path, "rb");
-  if (!file) {
-    return 0;
-  };
-  read_image_file(file);
-  fclose(file);
-  return 1;
-}
-
-void update_flags(uint16_t r) {
-  if (reg[r] == 0) {
-    reg[R_COND] = FL_ZRO;
-  } else if (reg[r] >> 15) /* a 1 in the left-most bit indicates negative */
-  {
-    reg[R_COND] = FL_NEG;
-  } else {
-    reg[R_COND] = FL_POS;
-  }
-}
-
-void handle_interrupt(int signal) {
-  restore_input_buffering();
-  printf("\n");
-  exit(-2);
-}
-
 int main(int argc, const char *argv[]) {
   if (argc < 2) {
     printf("Usage: lc3 [image-file1] ...\n");
-    return 2;
+    exit(2);
   }
 
   for (int i = 1; i < argc; ++i) {
     if (!read_image(argv[i])) {
       printf("failed to load image %s\n", argv[i]);
-      return 1;
+      exit(1);
     }
   }
 
@@ -241,7 +238,7 @@ int main(int argc, const char *argv[]) {
         reg[r0] = reg[r1] & imm5;
       } else {
         uint16_t r2 = instr & 0x7;
-        reg[0] = reg[r1] & reg[r2];
+        reg[r0] = reg[r1] & reg[r2];
       }
 
       update_flags(r0);
@@ -292,7 +289,7 @@ int main(int argc, const char *argv[]) {
     case OP_LD: {
       uint16_t r0 = (instr >> 9) & 0x7;
       uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
-      reg[r0] = mem_read(reg[R_PC + pc_offset]);
+      reg[r0] = mem_read(reg[R_PC] + pc_offset);
 
       update_flags(r0);
 
@@ -321,7 +318,7 @@ int main(int argc, const char *argv[]) {
 
     case OP_LEA: {
       uint16_t r0 = (instr >> 9) & 0x7;
-      uint16_t offset = sign_extend(instr & 0x3F, 9);
+      uint16_t offset = sign_extend(instr & 0x1FF, 9);
 
       reg[r0] = reg[R_PC] + offset;
 
@@ -421,12 +418,11 @@ int main(int argc, const char *argv[]) {
     break;
 
     case OP_RES:
-      abort();
 
     case OP_RTI:
-      abort();
 
     default:
+      abort();
       break;
     }
   }
