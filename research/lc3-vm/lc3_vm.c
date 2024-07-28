@@ -173,7 +173,7 @@ uint16_t mem_read(uint16_t address) {
 
 int main(int argc, const char *argv[]) {
   if (argc < 2) {
-    printf("Usage: lc3 [image-file1] ...\n");
+    printf("Usage: lc3-vm [image-file1] ...\n");
     exit(2);
   }
 
