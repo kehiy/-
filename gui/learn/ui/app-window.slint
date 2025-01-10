@@ -1,0 +1,54 @@
+import { Button, VerticalBox, LineEdit } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    
+    in property <string> results: "";
+    callback decode(string);
+    
+    background: #313e50;
+    title: "NIP-19 entity decoder";
+    GridLayout {
+        spacing: 25px;
+        padding: 50px;
+        Row {
+            Text {
+                text: "nip-19 decoder";
+                horizontal-alignment: center;
+                font-size: 24px;
+                font-weight: 900;
+                color: cyan;
+            }
+        }
+
+        Row {
+            nip19entity := LineEdit {
+                placeholder-text: "nip-19 entity...";
+                font-size: 14px;
+            }
+        }
+
+        Row {
+            Button {
+                text: "decode";
+                primary: true;
+                clicked => {decode(nip19entity.text);}
+            }
+        }
+
+        Row {
+            VerticalBox {
+                Rectangle {
+                    height: 100px;
+                    background: #f2f2f2;
+                    border-radius: 10px;
+                    Text {
+                        color: black;
+                        font-size: 16px;
+                        font-weight: 500;
+                        text: root.results;
+                    }
+                }
+            }
+        }
+    }
+}
