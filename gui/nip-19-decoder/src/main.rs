@@ -10,7 +10,7 @@ slint::include_modules!();
 fn decode(entity: &str) -> String {
     let mut result: String = "".to_string();
 
-    let typ = Nip19::from_bech32(entity).unwrap();
+    let typ = Nip19::from_bech32(entity).unwrap_or(Nip19::EventId(EventId::all_zeros()));
 
     if let Nip19::Pubkey(data) = typ {
         result = data.to_hex();
@@ -47,6 +47,11 @@ fn decode(entity: &str) -> String {
             data.public_key.to_hex(),
             data.relays
         );
+    }
+
+    // todo::: this is the most stupid way to prevent crash!
+    if result == "0000000000000000000000000000000000000000000000000000000000000000" {
+        return "invalid nip-19 entity!".to_string();
     }
 
     result

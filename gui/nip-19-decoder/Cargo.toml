@@ -1,5 +1,5 @@
 [package]
-name = "slint-rust-template"
+name = "nip-19-decoder"
 version = "0.1.0"
 edition = "2021"
 
