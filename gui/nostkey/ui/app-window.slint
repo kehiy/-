@@ -1,0 +1,54 @@
+import { Button, VerticalBox, HorizontalBox, GridBox } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    in-out property <string> pubkey: "";
+    in-out property <string> privkey: "";
+
+    callback generate_key();
+    callback clean();
+    callback copy();
+
+    title: "Nostkey";
+
+    width: 700px;
+    height: 250px;
+
+    GridLayout {
+        spacing: 25px;
+        padding: 50px;
+        Row {
+            keys := Text {
+                text: "public key: \{root.pubkey}\nprivate key: \{root.privkey}";
+            }
+        }
+
+        Row {
+            Button {
+                text: "Generate";
+                clicked => {
+                    root.generate_key();
+                }
+                width: 100px;
+                height: 25px;
+            }
+
+            Button {
+                text: "Copy";
+                clicked => {
+                    root.copy();
+                }
+                width: 100px;
+                height: 25px;
+            }
+
+            Button {
+                text: "Clean";
+                clicked => {
+                    root.clean();
+                }
+                width: 100px;
+                height: 25px;
+            }
+        }
+    }
+}
